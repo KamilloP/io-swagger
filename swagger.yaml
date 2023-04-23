@@ -1,56 +1,94 @@
-{
-  "swagger": "2.0",
-  "info": {
-    "title": "Odpowiedniki leków"
-  },
-  "schemes": [
-    "http"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "paths": {
-    "/search": {
-      "post": {
-        "summary": "Wykonaj proces wyszukiwania leku.",
-        "parameters": [
-          {
-            "name": "phrase",
-            "in": "query",
-            "description": "Fraza wpisana przez użytkownika.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lista wynikowa leków.",
-            "schema": {
-              "$ref": "#/definitions/Lista_leków"
-            }
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "Lek": {
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64",
-          "description": "Id leku jednoznacznie go identyfikujące."
-        }
-      }
-    },
-    "Lista_leków": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Lek"
-      }
-    }
-  }
-}
+openapi: 3.0.3
+info:
+  title: Odpowiedniki leków
+  version: 1.0.0
+paths:
+  /search:
+    post:
+      summary: Wyszukaj leku w bazie danych.
+      parameters:
+        - name: phrase
+          description: Fraza wpisana przez użytkownika.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Wyszukiwanie udane.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lek'
+  /drug/payment:
+    post:
+      summary: Sprawdzenie możliwych poziomów odpłatności.
+      parameters:
+        - name: id
+          description: Numer identyfikacyjny (id) leku.
+          required: true
+          schema:
+            type: string
+            format: i64
+      responses:
+        "200":
+          description: Sprawdzenie udane.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  enum: [30, 50, ryczałt, bezpłatny]
+                example: ["30", "bezpłatny"]
+  /drug/diseases:
+    post:
+      summary: Sprawdzenie możliwych zakresów wskazań.
+      parameters:
+        - name: id
+          description: Numer identyfikacyjny (id) leku.
+          required: true
+          schema:
+            type: string
+            format: i64
+      responses:
+        "200":
+          description: Sprawdzenie udane.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: ["Astma", "Przewlekła obturacyjna choroba płuc", "Eozynofilowe zapalenie oskrzeli"]
+components:
+  schemas:
+    Lek:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: i64
+          example: 2512
+        name:
+          type: string
+          example: Amoksiklav
+        substance:
+          type: string
+          example: amoksycylina
+        content:
+          type: string
+          example: granulat do sporządzania zawiesiny doustnej
+        ean:
+          type: string
+          example: 123456789
+        selling_price:
+          type: number
+          example: 27.99
+        wholesale_price:
+          type: number
+          example: 30.99
+        retail_price:
+          type: number
+          example: 12.99
