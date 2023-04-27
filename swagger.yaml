@@ -3,15 +3,112 @@ info:
   title: Odpowiedniki leków
   version: 1.0.0
 paths:
-  /search:
-    post:
-      summary: Wyszukaj leku w bazie danych.
+  #  /:
+  #    get:
+  #      summary: Kod źródłowy strony internetowej.
+  #      responses:
+  #        "200":
+  #          description: Pobieranie strony udane.
+  #  /search:
+  #    get:
+  #      summary: Wyszukiwanie leku w bazie danych.
+  #      parameters:
+  #        - in: query 
+  #          name: q
+  #          description: Fraza do wyszukiwania.
+  #          required: true
+  #          schema:
+  #            type: string
+  #        - in: query 
+  #          name: p 
+  #          description: Numer strony wyszukiwania (w stronicowaniu wyników).
+  #          required: false
+  #          schema:
+  #            type: integer
+  #            default: 1
+  #      responses:
+  #        "200":
+  #          description: Kod HTML na zapytanie przekazane w parametrach.
+  /api/groups/{group_id}:
+    get:
+      summary: Lista odpowiedników podanej grupy.
       parameters:
-        - name: phrase
-          description: Fraza wpisana przez użytkownika.
+        - in: path
+          name: group_id
+          description: Numer identyfikacyjny grupy odpowiedników.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pobieranie listy powiodło się.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Drug"
+        "404":
+          description: Lista o podanym id nie została znaleziona.
+  /api/details/{id}:
+    get:
+      summary: Szczegółowe informacje o leku o podanym id.
+      parameters:
+        - in: path
+          name: id
+          description: Numer identyfikacyjny leku. 
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pobieranie informacji o leku powiodło się.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drug'
+        "404":
+          description: Lek o podanym id nie została znaleziony.
+
+  /api/selection/{ean}:
+    get:
+      summary: Szczegółowe informacje o leku o kodzie EAN.
+      parameters:
+        - in: path
+          name: ean
+          description: Kod EAN leku do sprawdzenia.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pobieranie informacji o leku powiodło się.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Drug"
+                  
+        "404":
+          description: Lek o podanym EAN nie został znaleziony.
+  /api/search:
+    get:
+      summary: Wyszukiwanie leków.
+      parameters:
+        - in: query 
+          name: q
+          description: Fraza do wyszukiwania.
           required: true
           schema:
             type: string
+        - in: query 
+          name: p 
+          description: Numer strony wyszukiwania (w stronicowaniu wyników).
+          required: false
+          schema:
+            type: integer
+            default: 1
       responses:
         "200":
           description: Wyszukiwanie udane.
@@ -20,51 +117,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Lek'
-  /drug/payment:
-    post:
-      summary: Sprawdzenie możliwych poziomów odpłatności.
-      parameters:
-        - name: id
-          description: Numer identyfikacyjny (id) leku.
-          required: true
-          schema:
-            type: string
-            format: i64
-      responses:
-        "200":
-          description: Sprawdzenie udane.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  enum: [30, 50, ryczałt, bezpłatny]
-                example: ["30", "bezpłatny"]
-  /drug/diseases:
-    post:
-      summary: Sprawdzenie możliwych zakresów wskazań.
-      parameters:
-        - name: id
-          description: Numer identyfikacyjny (id) leku.
-          required: true
-          schema:
-            type: string
-            format: i64
-      responses:
-        "200":
-          description: Sprawdzenie udane.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example: ["Astma", "Przewlekła obturacyjna choroba płuc", "Eozynofilowe zapalenie oskrzeli"]
+                  $ref: "#/components/schemas/Drug"
+        "400":
+          description: Zły numer strony.
 components:
   schemas:
-    Lek:
+    Drug:
       type: object
       properties:
         id:
@@ -74,21 +132,25 @@ components:
         name:
           type: string
           example: Amoksiklav
-        substance:
-          type: string
-          example: amoksycylina
-        content:
-          type: string
-          example: granulat do sporządzania zawiesiny doustnej
         ean:
           type: string
           example: 123456789
-        selling_price:
-          type: number
-          example: 27.99
-        wholesale_price:
+        refound:
+          type: string
+          example: 30
+        price:
           type: number
           example: 30.99
-        retail_price:
+        amount:
           type: number
-          example: 12.99
+          example: 5
+        amount_unit:
+          type:
+            - string
+            - 'null'
+          example: 'null'
+        group_id:
+          type:
+            - integer
+            - 'null'
+          example: '5'
