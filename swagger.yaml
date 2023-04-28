@@ -137,7 +137,7 @@ components:
           type: string
           description: Kod EAN.
           example: 123456789
-        refound:
+        refund:
           type: string
           description: Poziom refundacji.
           example: 30
