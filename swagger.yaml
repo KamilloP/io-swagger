@@ -117,7 +117,15 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Drug"
+                  type: object
+                  properties:
+                    selection_needed:
+                      type: boolean
+                    drug:
+                      $ref: "#/components/schemas/Drug"
+                  required:
+                    - selection_needed
+                    - drug
         "400":
           description: Zły numer strony.
 components:
